@@ -108,7 +108,7 @@ const Navbar = () => {
               <motion.div key={link.name} whileHover={{ y: -2 }}>
                 <Link
                   to={link.href}
-                  className={`relative px-4 py-2 rounded-lg font-medium transition-all duration-200 group ${
+                  className={`cursor-hover relative px-4 py-2 rounded-lg font-medium transition-all duration-200 group ${
                     location.pathname === link.href
                       ? 'text-emerald-600'
                       : 'text-gray-700 hover:text-emerald-600'
@@ -137,7 +137,7 @@ const Navbar = () => {
               <motion.div key={link.name} whileHover={{ y: -2 }}>
                 <Link
                   to={link.href}
-                  className={`relative px-4 py-2 rounded-lg font-medium transition-all duration-200 group ${
+                  className={`cursor-hover relative px-4 py-2 rounded-lg font-medium transition-all duration-200 group ${
                     location.pathname === link.href
                       ? 'text-emerald-600'
                       : 'text-gray-700 hover:text-emerald-600'
@@ -266,7 +266,7 @@ const Navbar = () => {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Link
                     to="/register"
-                    className="relative px-6 py-2.5 font-medium text-white rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-emerald-200"
+                    className="cursor-hover relative px-6 py-2.5 font-medium text-white rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-emerald-200"
                   >
                     <span className="relative z-10">Get Started</span>
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-green-500 blur opacity-30 group-hover:opacity-50 transition-opacity"></div>

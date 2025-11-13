@@ -7,6 +7,7 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CursorEffect } from './cursor';
 
 // Components
 import Navbar from "./components/Navbar";
@@ -31,6 +32,7 @@ function AppContent() {
 
   return (
     <div className="App">
+      <CursorEffect />
       <Navbar />
       {/* Add padding-top to account for fixed navbar */}
       <div className="pt-20">
