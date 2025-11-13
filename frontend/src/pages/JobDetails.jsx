@@ -5,13 +5,16 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { MapPin, Briefcase, Clock, ArrowLeft, ExternalLink } from 'lucide-react';
-import api from '../utils/api';
-import toast from 'react-hot-toast';
+import { motion } from "framer-motion";
+import { MapPin, Briefcase, Clock, ArrowLeft, ExternalLink } from "lucide-react";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
+import toast from "react-hot-toast";
 
 const JobDetails = () => {
   const { id } = useParams();
+  const { currentUser } = useAuth();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +30,43 @@ const JobDetails = () => {
       toast.error('Failed to load job details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchJobDetails = async (jobId) => {
+    try {
+      const jobRef = doc(db, 'jobs', jobId);
+      const jobSnap = await getDoc(jobRef);
+      
+      if (jobSnap.exists()) {
+        setJob({ id: jobSnap.id, ...jobSnap.data() });
+      } else {
+        toast.error('Job not found');
+      }
+    } catch (error) {
+      console.error('Error fetching job:', error);
+      toast.error('Failed to load job details');
+    }
+  };
+
+  const handleApply = async () => {
+    if (!currentUser) {
+      toast.error('Please login to apply');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'applications'), {
+        jobId: job.id,
+        userId: currentUser.uid,
+        appliedAt: serverTimestamp(),
+        status: 'pending'
+      });
+      
+      toast.success('Application submitted successfully!');
+    } catch (error) {
+      console.error('Error applying:', error);
+      toast.error('Failed to submit application');
     }
   };
 
@@ -117,7 +157,7 @@ const JobDetails = () => {
 
           {/* Apply Button */}
           <div className="flex gap-4">
-            <button className="btn-primary flex items-center space-x-2">
+            <button className="btn-primary flex items-center space-x-2" onClick={handleApply}>
               <ExternalLink size={18} />
               <span>Apply Now</span>
             </button>

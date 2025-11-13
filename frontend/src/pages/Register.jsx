@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, ArrowRight, GraduationCap, Briefcase, Target } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -20,11 +20,11 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, register, signInWithGoogle } = useAuth();
+  const { currentUser, signup } = useAuth();
 
   useEffect(() => {
-    if (user) navigate('/dashboard');
-  }, [user, navigate]);
+    if (currentUser) navigate('/dashboard');
+  }, [currentUser, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,12 +39,14 @@ const Register = () => {
     }
 
     setLoading(true);
-    const result = await register(formData);
-    setLoading(false);
-    
-    if (result.success) {
+    try {
+      await signup(formData.email, formData.password, formData.name);
+      // Additional profile data can be saved separately to Firestore
       navigate('/dashboard');
+    } catch (error) {
+      console.error('Registration error:', error);
     }
+    setLoading(false);
   };
 
   const educationOptions = ['High School', 'Undergraduate', 'Graduate', 'Postgraduate', 'Other'];

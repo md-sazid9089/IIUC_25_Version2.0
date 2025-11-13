@@ -5,9 +5,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ExternalLink, BookOpen, Filter as FilterIcon } from 'lucide-react';
-import api from '../utils/api';
-import toast from 'react-hot-toast';
+import { Search, ExternalLink, BookOpen, Filter as FilterIcon } from "lucide-react";
+import { resourcesService } from '../services/firestoreService';
+import toast from "react-hot-toast";
 
 const Resources = () => {
   const [resources, setResources] = useState([]);
@@ -20,24 +20,25 @@ const Resources = () => {
   });
 
   useEffect(() => {
-    fetchResources();
-  }, []);
+    // Replace old API call
+    const loadResources = async () => {
+      setLoading(true);
+      try {
+        const resourcesData = await resourcesService.getAllResources();
+        setResources(resourcesData);
+      } catch (error) {
+        console.error('Error loading resources:', error);
+        toast.error("Failed to load resources");
+      }
+      setLoading(false);
+    };
+
+    loadResources();
+  }, [selectedCategory]);
 
   useEffect(() => {
     applyFilters();
   }, [filters, resources]);
-
-  const fetchResources = async () => {
-    try {
-      const response = await api.get('/resources');
-      setResources(response.data.resources);
-      setFilteredResources(response.data.resources);
-    } catch (error) {
-      toast.error('Failed to load resources');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const applyFilters = () => {
     let result = resources;

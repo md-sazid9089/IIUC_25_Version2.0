@@ -7,8 +7,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Briefcase, BookOpen, TrendingUp, ArrowRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
+import { jobsService, applicationsService } from '../services/firestoreService';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const Dashboard = () => {

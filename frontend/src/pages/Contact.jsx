@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Send, MapPin, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../utils/api';
+import { contactService } from '../services/firestoreService';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -27,14 +27,20 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      await api.post('/contact', formData);
-      toast.success('Message sent successfully! We\'ll get back to you soon.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      await contactService.submitContactForm({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message
+      });
+
+      toast.success("Message sent successfully!");
+      setFormData({ name: '', email: '', message: '' });
     } catch (error) {
-      toast.error('Failed to send message. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error('Error sending message:', error);
+      toast.error("Failed to send message. Please try again.");
     }
+
+    setLoading(false);
   };
 
   const contactInfo = [

@@ -3,19 +3,17 @@
  * User authentication with email and password
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { user, login, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
@@ -24,21 +22,18 @@ const Login = () => {
     if (user) navigate('/dashboard');
   }, [user, navigate]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
 
-    const result = await login(formData);
-    
-    setLoading(false);
-    
-    if (result.success) {
+    try {
+      await login(email, password);
       navigate('/dashboard');
+    } catch (error) {
+      setError('Failed to log in: ' + error.message);
     }
+    setLoading(false);
   };
 
   const handleGoogle = async () => {
@@ -75,8 +70,8 @@ const Login = () => {
                   name="email"
                   type="email"
                   required
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="input-field pl-11"
                   placeholder="you@example.com"
                   aria-label="Email address"
@@ -96,8 +91,8 @@ const Login = () => {
                   name="password"
                   type="password"
                   required
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="input-field pl-11"
                   placeholder="••••••••"
                   aria-label="Password"

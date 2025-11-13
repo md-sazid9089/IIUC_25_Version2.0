@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Moon, Sun, User, LogOut, Briefcase, BookOpen, LayoutDashboard } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import SimpleHoverEffect from '../SimpleHoverEffect';
 
@@ -121,8 +121,10 @@ const Navbar = () => {
                   Login
                 </Link>
                 <SimpleHoverEffect accentColor="#10b981" scaleAmount={1.08}>
-                  <Link to="/register" className="btn-primary get-started-nav-button">
-                    Get Started
+                  <Link to="/register">
+                    <button className="btn-primary">
+                      Get Started
+                    </button>
                   </Link>
                 </SimpleHoverEffect>
               </>

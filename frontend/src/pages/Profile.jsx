@@ -3,15 +3,16 @@
  * Edit user profile, skills, and CV
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Save, X, Plus } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
+import { useAuth } from '../contexts/AuthContext';
+import { userService } from '../services/firestoreService';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
-  const { user, updateUser } = useAuth();
+  const { currentUser } = useAuth();
+  const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     education: '',
@@ -23,22 +24,33 @@ const Profile = () => {
     cvText: '',
   });
   const [newSkill, setNewSkill] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        education: user.education || 'Undergraduate',
-        experienceLevel: user.experienceLevel || 'Student',
-        careerTrack: user.careerTrack || 'Web Development',
-        skills: user.skills || [],
-        experienceDesc: user.experienceDesc || '',
-        careerInterests: user.careerInterests || '',
-        cvText: user.cvText || '',
-      });
+    if (currentUser) {
+      loadUserData();
     }
-  }, [user]);
+  }, [currentUser]);
+
+  const loadUserData = async () => {
+    try {
+      const profileData = await userService.getUserProfile(currentUser.uid);
+      setProfile(profileData);
+      setFormData({
+        name: profileData.name || '',
+        education: profileData.education || 'Undergraduate',
+        experienceLevel: profileData.experienceLevel || 'Student',
+        careerTrack: profileData.careerTrack || 'Web Development',
+        skills: profileData.skills || [],
+        experienceDesc: profileData.experienceDesc || '',
+        careerInterests: profileData.careerInterests || '',
+        cvText: profileData.cvText || '',
+      });
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+    setLoading(false);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -83,128 +95,148 @@ const Profile = () => {
         </motion.div>
 
         <div className="card p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Info */}
-            <div className="grid md:grid-cols-2 gap-6">
+          {loading ? (
+            <div>Loading profile...</div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                  <input
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Education</label>
+                  <select name="education" value={formData.education} onChange={handleChange} className="input-field">
+                    {['High School', 'Undergraduate', 'Graduate', 'Postgraduate', 'Other'].map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Experience Level</label>
+                  <select name="experienceLevel" value={formData.experienceLevel} onChange={handleChange} className="input-field">
+                    {['Student', 'Fresher', 'Junior', 'Mid-level', 'Senior'].map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Career Track</label>
+                  <select name="careerTrack" value={formData.careerTrack} onChange={handleChange} className="input-field">
+                    {['Web Development', 'Mobile Development', 'Data Science', 'UI/UX Design', 'Digital Marketing', 'Content Writing', 'Graphic Design', 'Business', 'Other'].map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Skills */}
               <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
-                <input
-                  name="name"
-                  type="text"
-                  value={formData.name}
+                <label className="block text-sm font-medium mb-2">Skills</label>
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                    className="input-field flex-1"
+                    placeholder="Add a skill (e.g., JavaScript, Excel)"
+                  />
+                  <button type="button" onClick={addSkill} className="btn-primary px-4">
+                    <Plus size={20} />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.skills.map((skill) => (
+                    <span key={skill} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center space-x-2">
+                      <span>{skill}</span>
+                      <button type="button" onClick={() => removeSkill(skill)} className="hover:text-primary-dark">
+                        <X size={14} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Experience Description</label>
+                <textarea
+                  name="experienceDesc"
+                  value={formData.experienceDesc}
                   onChange={handleChange}
-                  className="input-field"
-                  required
+                  rows={3}
+                  className="input-field resize-none"
+                  placeholder="Briefly describe your experience, projects, or activities..."
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Education</label>
-                <select name="education" value={formData.education} onChange={handleChange} className="input-field">
-                  {['High School', 'Undergraduate', 'Graduate', 'Postgraduate', 'Other'].map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+              {/* Career Interests */}
               <div>
-                <label className="block text-sm font-medium mb-2">Experience Level</label>
-                <select name="experienceLevel" value={formData.experienceLevel} onChange={handleChange} className="input-field">
-                  {['Student', 'Fresher', 'Junior', 'Mid-level', 'Senior'].map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Career Track</label>
-                <select name="careerTrack" value={formData.careerTrack} onChange={handleChange} className="input-field">
-                  {['Web Development', 'Mobile Development', 'Data Science', 'UI/UX Design', 'Digital Marketing', 'Content Writing', 'Graphic Design', 'Business', 'Other'].map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Skills</label>
-              <div className="flex gap-2 mb-3">
-                <input
-                  type="text"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                  className="input-field flex-1"
-                  placeholder="Add a skill (e.g., JavaScript, Excel)"
+                <label className="block text-sm font-medium mb-2">Career Interests</label>
+                <textarea
+                  name="careerInterests"
+                  value={formData.careerInterests}
+                  onChange={handleChange}
+                  rows={2}
+                  className="input-field resize-none"
+                  placeholder="What are your career goals and interests?"
                 />
-                <button type="button" onClick={addSkill} className="btn-primary px-4">
-                  <Plus size={20} />
-                </button>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.skills.map((skill) => (
-                  <span key={skill} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center space-x-2">
-                    <span>{skill}</span>
-                    <button type="button" onClick={() => removeSkill(skill)} className="hover:text-primary-dark">
-                      <X size={14} />
-                    </button>
-                  </span>
-                ))}
+
+              {/* CV Text */}
+              <div>
+                <label className="block text-sm font-medium mb-2">CV / Resume (Paste Text)</label>
+                <textarea
+                  name="cvText"
+                  value={formData.cvText}
+                  onChange={handleChange}
+                  rows={6}
+                  className="input-field resize-none font-mono text-sm"
+                  placeholder="Paste your CV or resume content here for better matching..."
+                />
               </div>
-            </div>
 
-            {/* Experience */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Experience Description</label>
-              <textarea
-                name="experienceDesc"
-                value={formData.experienceDesc}
-                onChange={handleChange}
-                rows={3}
-                className="input-field resize-none"
-                placeholder="Briefly describe your experience, projects, or activities..."
-              />
-            </div>
+              {/* Submit */}
+              <button type="submit" disabled={loading} className="btn-primary flex items-center space-x-2">
+                {loading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    <Save size={18} />
+                    <span>Save Changes</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
 
-            {/* Career Interests */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Career Interests</label>
-              <textarea
-                name="careerInterests"
-                value={formData.careerInterests}
-                onChange={handleChange}
-                rows={2}
-                className="input-field resize-none"
-                placeholder="What are your career goals and interests?"
-              />
-            </div>
-
-            {/* CV Text */}
-            <div>
-              <label className="block text-sm font-medium mb-2">CV / Resume (Paste Text)</label>
-              <textarea
-                name="cvText"
-                value={formData.cvText}
-                onChange={handleChange}
-                rows={6}
-                className="input-field resize-none font-mono text-sm"
-                placeholder="Paste your CV or resume content here for better matching..."
-              />
-            </div>
-
-            {/* Submit */}
-            <button type="submit" disabled={loading} className="btn-primary flex items-center space-x-2">
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  <Save size={18} />
-                  <span>Save Changes</span>
-                </>
-              )}
-            </button>
-          </form>
+        {/* Applications section */}
+        <div className="mt-8">
+          <h2 className="font-heading text-2xl font-bold mb-4">My Applications</h2>
+          {(!applications || applications.length === 0) ? (
+            <p className="text-text-muted">You have not applied to any jobs yet.</p>
+          ) : (
+            applications.map((app) => (
+              <div key={app.id} className="application-card">
+                <p className="text-sm text-text-muted">Job ID: {app.jobId}</p>
+                <p className="text-sm text-text-muted">Status: {app.status}</p>
+                <p className="text-sm text-text-muted">Applied: {app.appliedAt?.toDate?.()?.toLocaleDateString()}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

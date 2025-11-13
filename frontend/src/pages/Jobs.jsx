@@ -3,75 +3,40 @@
  * Browse and filter job listings
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Briefcase, Filter } from 'lucide-react';
-import api from '../utils/api';
+import { jobsService } from '../services/firestoreService';
 import toast from 'react-hot-toast';
 import SimpleHoverEffect from '../SimpleHoverEffect';
 import SimpleWebEffect from '../SimpleWebEffect';
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
-  const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    search: '',
-    type: '',
-    experienceLevel: '',
-    location: '',
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    fetchJobs();
+    // Real-time listener for jobs
+    const unsubscribe = jobsService.subscribeToJobs((jobsData) => {
+      setJobs(jobsData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [filters, jobs]);
-
-  const fetchJobs = async () => {
+  const handleSearch = async () => {
+    setLoading(true);
     try {
-      const response = await api.get('/jobs');
-      setJobs(response.data.jobs);
-      setFilteredJobs(response.data.jobs);
+      const results = await jobsService.searchJobs(searchTerm, filters);
+      setJobs(results);
     } catch (error) {
-      toast.error('Failed to load jobs');
-    } finally {
-      setLoading(false);
+      console.error('Search error:', error);
     }
-  };
-
-  const applyFilters = () => {
-    let result = jobs;
-
-    if (filters.search) {
-      result = result.filter(job =>
-        job.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        job.company.toLowerCase().includes(filters.search.toLowerCase())
-      );
-    }
-
-    if (filters.type) {
-      result = result.filter(job => job.type === filters.type);
-    }
-
-    if (filters.experienceLevel) {
-      result = result.filter(job => job.experienceLevel === filters.experienceLevel);
-    }
-
-    if (filters.location) {
-      result = result.filter(job =>
-        job.location.toLowerCase().includes(filters.location.toLowerCase())
-      );
-    }
-
-    setFilteredJobs(result);
-  };
-
-  const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    setLoading(false);
   };
 
   return (
@@ -86,17 +51,16 @@ const Jobs = () => {
           <p className="text-text-muted">Browse {jobs.length}+ opportunities for students and fresh graduates</p>
         </motion.div>
 
-        {/* Filters */}
+        {/* Search interface */}
         <div className="card p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={20} />
               <input
-                name="search"
                 type="text"
-                value={filters.search}
-                onChange={handleFilterChange}
                 placeholder="Search jobs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="input-field pl-11"
               />
             </div>
@@ -137,18 +101,18 @@ const Jobs = () => {
           <div className="flex justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
           </div>
-        ) : filteredJobs.length > 0 ? (
+        ) : jobs.length > 0 ? (
           <div className="grid gap-6">
-            {filteredJobs.map((job, index) => (
+            {jobs.map((job, index) => (
               <motion.div
-                key={job._id}
+                key={job.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
                 <SimpleWebEffect webColor="#10b981">
                   <SimpleHoverEffect accentColor="#10b981">
-                    <Link to={`/jobs/${job._id}`} className="card p-6 hover:shadow-lift transition-all block">
+                    <Link to={`/jobs/${job.id}`} className="card p-6 hover:shadow-lift transition-all block">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-start justify-between mb-2">
