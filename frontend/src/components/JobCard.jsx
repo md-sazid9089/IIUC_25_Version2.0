@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { applicationsService } from '../services/firestoreService';
 import { useAuth } from '../contexts/AuthContext';
 
-const JobCard = ({ job }) => {
+const JobCard = memo(({ job }) => {
   const { currentUser } = useAuth();
 
   const handleApply = async () => {
@@ -46,6 +46,8 @@ const JobCard = ({ job }) => {
       </div>
     </motion.article>
   );
-};
+});
+
+JobCard.displayName = 'JobCard';
 
 export default JobCard;

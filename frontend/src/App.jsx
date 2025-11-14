@@ -2,36 +2,43 @@
  * App Component
  * Main application with routing and layout
  */
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 
-// Components
+// Components (loaded immediately as they're needed on every page)
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
-// Pages
-import Home from "./pages/Home";
-import Jobs from "./pages/Jobs";
-import JobDetails from "./pages/JobDetails";
-import Resources from "./pages/Resources";
-import LearningResources from "./pages/LearningResources";
-import Contact from "./pages/Contact";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import Dashboard from "./pages/Dashboard";
-import Chatassistance from "./pages/chatassistance";
-import CareerRoadmap from "./pages/CareerRoadmap";
-import CvUpload from "./pages/CvUpload";
-import AdminPanel from "./pages/AdminPanel";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminCourses from "./pages/AdminCourses";
+// Lazy load pages for better performance
+const Home = lazy(() => import("./pages/Home"));
+const Jobs = lazy(() => import("./pages/Jobs"));
+const JobDetails = lazy(() => import("./pages/JobDetails"));
+const Resources = lazy(() => import("./pages/Resources"));
+const LearningResources = lazy(() => import("./pages/LearningResources"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Chatassistance = lazy(() => import("./pages/chatassistance"));
+const CareerRoadmap = lazy(() => import("./pages/CareerRoadmap"));
+const CvUpload = lazy(() => import("./pages/CvUpload"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminCourses = lazy(() => import("./pages/AdminCourses"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-base">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+);
 
 function AppContent() {
   const location = useLocation();
@@ -43,8 +50,9 @@ function AppContent() {
       {!isAdminRoute && <Navbar />}
       {/* Add padding-top to account for fixed navbar only for non-admin routes */}
       <div className={!isAdminRoute ? 'pt-20' : ''}>
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+        <Suspense fallback={<PageLoader />}>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
             {/* Home route - show home page or redirect if logged in */}
             <Route path="/" element={<Home />} />
             <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
@@ -68,8 +76,9 @@ function AppContent() {
             <Route path="/admin-dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
             <Route path="/admin/jobs" element={<AdminProtectedRoute><AdminPanel /></AdminProtectedRoute>} />
             <Route path="/admin/courses" element={<AdminProtectedRoute><AdminCourses /></AdminProtectedRoute>} />
-          </Routes>
-        </AnimatePresence>
+            </Routes>
+          </AnimatePresence>
+        </Suspense>
       </div>
       {/* Show footer only for non-admin routes */}
       {!isAdminRoute && <Footer />}
