@@ -4,6 +4,9 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -468,12 +471,13 @@ const CourseResources = () => {
         ) : (
           <>
             {/* Courses Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ perspective: '1000px' }}>
               {filteredCourses.map((course, index) => (
                 <div
                   key={course.id}
-                  className="neon-card overflow-hidden transition-all duration-300 transform hover:-translate-y-2 animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  ref={(el) => (cardRefs.current[index] = el)}
+                  className="neon-card overflow-hidden transition-all duration-300"
+                  style={{ transformStyle: 'preserve-3d' }}
                 >
                   {/* Course Image */}
                   <div className="relative h-48 overflow-hidden">
