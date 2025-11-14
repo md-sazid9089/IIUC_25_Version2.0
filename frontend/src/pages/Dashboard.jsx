@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { User, Briefcase, BookOpen, TrendingUp, ArrowRight, GraduationCap, CheckCircle, Sparkles, MapPin, Award } from 'lucide-react';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
@@ -17,48 +17,14 @@ const Dashboard = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [skillGapResources, setSkillGapResources] = useState([]);
 
-  // Monitor authentication state
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      if (user) {
-        loadUserProfile(user.uid);
-        fetchEnrolledCourses(user.email);
-        fetchRecommendedCourses(user.email);
-        fetchSkillGapResources(user.uid);
-        fetchAppliedJobs(user.email);
-      } else {
-        setLoading(false);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Load user profile and calculate completion
-  const loadUserProfile = async (userId) => {
-    try {
-      const userDocRef = doc(db, 'users', userId);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUserProfile(userData);
-        calculateCompletion(userData);
-      } else {
-        setProfileCompletion(0);
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-      setProfileCompletion(0);
-    }
-  };
-
-  const calculateCompletion = (data) => {
+  // Memoize profile completion calculation
+  const calculateCompletion = useCallback((data) => {
     const fields = [
       { key: 'bio', weight: 10 },
-      { key: 'skills', weight: 30, check: (val) => val && val.length > 0 },
-      { key: 'experienceLevel', weight: 20 },
-      { key: 'preferredTrack', weight: 20 },
+      { key: 'skills', weight: 20, check: (val) => val && val.length > 0 },
+      { key: 'tools', weight: 20, check: (val) => val && val.length > 0 },
+      { key: 'experienceLevel', weight: 15 },
+      { key: 'preferredTrack', weight: 15 },
       { key: 'location', weight: 10 },
       { key: 'education', weight: 10 }
     ];
@@ -75,11 +41,30 @@ const Dashboard = () => {
       }
     });
     
-    setProfileCompletion(completed);
-  };
+    return completed;
+  }, []);
+
+  // Load user profile and calculate completion
+  const loadUserProfile = useCallback(async (userId) => {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUserProfile(userData);
+        setProfileCompletion(calculateCompletion(userData));
+      } else {
+        setProfileCompletion(0);
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      setProfileCompletion(0);
+    }
+  }, [calculateCompletion]);
 
   // Fetch courses where user is enrolled
-  const fetchEnrolledCourses = async (userEmail) => {
+  const fetchEnrolledCourses = useCallback(async (userEmail) => {
     try {
       const coursesRef = collection(db, 'Courses');
       const snapshot = await getDocs(coursesRef);
@@ -110,10 +95,10 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching enrolled courses:', error);
     }
-  };
+  }, []);
 
   // Fetch skill gap learning resources
-  const fetchSkillGapResources = async (userId) => {
+  const fetchSkillGapResources = useCallback(async (userId) => {
     try {
       // Get user profile
       const userDocRef = doc(db, 'users', userId);
@@ -185,10 +170,10 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching skill gap resources:', error);
     }
-  };
+  }, []);
 
   // Fetch recommended courses based on user interests
-  const fetchRecommendedCourses = async (userEmail) => {
+  const fetchRecommendedCourses = useCallback(async (userEmail) => {
     try {
       setLoading(true);
 
@@ -274,10 +259,10 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Fetch jobs that user has applied to
-  const fetchAppliedJobs = async (userEmail) => {
+  const fetchAppliedJobs = useCallback(async (userEmail) => {
     try {
       const jobsRef = collection(db, 'jobs');
       const snapshot = await getDocs(jobsRef);
@@ -310,7 +295,24 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching applied jobs:', error);
     }
-  };
+  }, []);
+
+  // Monitor authentication state - placed after all useCallback definitions
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (user) {
+        loadUserProfile(user.uid);
+        fetchEnrolledCourses(user.email);
+        fetchRecommendedCourses(user.email);
+        fetchSkillGapResources(user.uid);
+        fetchAppliedJobs(user.email);
+      } else {
+        setLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [loadUserProfile, fetchEnrolledCourses, fetchRecommendedCourses, fetchSkillGapResources, fetchAppliedJobs]);
 
   return (
     <div className="min-h-screen bg-base">

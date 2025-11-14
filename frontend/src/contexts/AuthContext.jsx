@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const signup = async (email, password, name) => {
+  const signup = useCallback(async (email, password, name) => {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(result.user, { displayName: name });
@@ -37,22 +37,22 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       throw error;
     }
-  };
+  }, []);
 
-  const login = (email, password) => {
+  const login = useCallback((email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     return signOut(auth);
-  };
+  }, []);
 
-  const getUserData = async (uid) => {
+  const getUserData = useCallback(async (uid) => {
     const userDoc = await getDoc(doc(db, 'users', uid));
     return userDoc.exists() ? userDoc.data() : null;
-  };
+  }, []);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Google sign-in error:', error);
       throw error;
     }
-  };
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const value = {
+  const value = useMemo(() => ({
     currentUser,
     loading,
     signup,
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     getUserData,
     signInWithGoogle
-  };
+  }), [currentUser, loading, signup, login, logout, getUserData, signInWithGoogle]);
 
   return (
     <AuthContext.Provider value={value}>
