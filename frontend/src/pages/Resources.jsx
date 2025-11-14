@@ -345,7 +345,15 @@ const CourseResources = () => {
                       >
                         View Details
                       </button>
-                      {!enrolledCourses.has(course.id) && (
+                      {enrolledCourses.has(course.id) ? (
+                        <button
+                          onClick={() => handleUnenrollment(course.id)}
+                          disabled={unenrolling}
+                          className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-4 rounded-xl hover:from-red-700 hover:to-pink-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {unenrolling && unenrollingCourseId === course.id ? 'Unenrolling...' : 'Unenroll'}
+                        </button>
+                      ) : (
                         <button
                           onClick={() => handleEnrollment(course.id)}
                           disabled={enrolling || !currentUser}
@@ -449,7 +457,16 @@ const CourseResources = () => {
                 >
                   Close
                 </button>
-                {!enrolledCourses.has(selectedCourse.id) && (
+                {enrolledCourses.has(selectedCourse.id) ? (
+                  <button
+                    onClick={() => handleUnenrollment(selectedCourse.id)}
+                    disabled={unenrolling}
+                    className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg transition-all font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    style={{boxShadow: '0 0 30px rgba(239,68,68,0.4)'}}
+                  >
+                    {unenrolling && unenrollingCourseId === selectedCourse.id ? 'Unenrolling...' : 'Unenroll from Course'}
+                  </button>
+                ) : (
                   <button
                     onClick={() => handleEnrollment(selectedCourse.id)}
                     disabled={enrolling || !currentUser}
