@@ -18,6 +18,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
+import JobMatchPage from "./pages/JobMatchPage";
 import Resources from "./pages/Resources";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -42,6 +43,7 @@ function AppContent() {
             <Route path="/" element={currentUser ? <Navigate to="/dashboard" replace /> : <Home />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetails />} />
+            <Route path="/jobs/match" element={<ProtectedRoute><JobMatchPage /></ProtectedRoute>} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
