@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, BookOpen, Users, Clock, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { gsap } from 'gsap';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -32,6 +33,87 @@ const CourseResources = () => {
   const [unenrollingCourseId, setUnenrollingCourseId] = useState(null);
   const [notification, setNotification] = useState(null);
   const [enrolledCourses, setEnrolledCourses] = useState(new Set());
+  
+  // Refs for GSAP animations
+  const headerRef = useRef(null);
+  const iconRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+
+  // GSAP 3D Header Animation
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Animate icon with 3D rotation
+      gsap.from(iconRef.current, {
+        duration: 1.5,
+        rotationY: -180,
+        rotationX: 20,
+        scale: 0,
+        opacity: 0,
+        ease: "elastic.out(1, 0.5)",
+        transformPerspective: 1000,
+        transformOrigin: "center center"
+      });
+
+      // Animate title with 3D effect
+      gsap.from(titleRef.current, {
+        duration: 1.2,
+        y: -50,
+        rotationX: -90,
+        opacity: 0,
+        scale: 0.5,
+        ease: "back.out(1.7)",
+        delay: 0.3,
+        transformPerspective: 1000,
+        transformOrigin: "center bottom"
+      });
+
+      // Animate subtitle with 3D sliding effect
+      gsap.from(subtitleRef.current, {
+        duration: 1,
+        z: -200,
+        opacity: 0,
+        scale: 0.8,
+        ease: "power3.out",
+        delay: 0.6,
+        transformPerspective: 1000
+      });
+
+      // Continuous floating animation for icon
+      gsap.to(iconRef.current, {
+        y: -15,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+
+      // Subtle 3D tilt animation on mouse move
+      const handleMouseMove = (e) => {
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+        
+        const xPos = (clientX / innerWidth - 0.5) * 20;
+        const yPos = (clientY / innerHeight - 0.5) * 20;
+        
+        gsap.to(headerRef.current, {
+          rotationY: xPos,
+          rotationX: -yPos,
+          duration: 0.5,
+          ease: "power2.out",
+          transformPerspective: 1000
+        });
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+      
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+      };
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   // Monitor authentication state
   useEffect(() => {
@@ -249,12 +331,16 @@ const CourseResources = () => {
       )}
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#A855F7] to-[#D500F9] text-white py-20 px-4">
+      <div className="bg-gradient-to-r from-[#A855F7] to-[#D500F9] text-white py-20 px-4 overflow-hidden" style={{ perspective: '1000px' }}>
         <div className="max-w-7xl mx-auto">
-          <div className="text-center animate-fade-in">
-            <BookOpen size={72} className="mx-auto mb-6 drop-shadow-lg" />
-            <h1 className="text-6xl font-bold mb-6 drop-shadow-lg" style={{textShadow: '0 4px 20px rgba(0,0,0,0.4)'}}>Course Resources</h1>
-            <p className="text-2xl font-medium drop-shadow-md" style={{textShadow: '0 2px 10px rgba(0,0,0,0.3)'}}>
+          <div ref={headerRef} className="text-center" style={{ transformStyle: 'preserve-3d' }}>
+            <div ref={iconRef} style={{ transformStyle: 'preserve-3d' }}>
+              <BookOpen size={72} className="mx-auto mb-6 drop-shadow-lg" />
+            </div>
+            <h1 ref={titleRef} className="text-6xl font-bold mb-6 drop-shadow-lg" style={{textShadow: '0 4px 20px rgba(0,0,0,0.4)', transformStyle: 'preserve-3d'}}>
+              Course Resources
+            </h1>
+            <p ref={subtitleRef} className="text-2xl font-medium drop-shadow-md" style={{textShadow: '0 2px 10px rgba(0,0,0,0.3)', transformStyle: 'preserve-3d'}}>
               Explore our comprehensive collection of courses and start learning today
             </p>
           </div>
