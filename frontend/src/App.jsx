@@ -7,7 +7,6 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { CursorEffect } from './cursor';
 
 // Components
 import Navbar from "./components/Navbar";
@@ -19,12 +18,12 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
-import JobMatchPage from "./pages/JobMatchPage";
 import Resources from "./pages/Resources";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import ChatBot from "./pages/ChatBot";
 import AdminPanel from "./pages/AdminPanel";
@@ -41,7 +40,6 @@ function AppContent() {
 
   return (
     <div className="App">
-      <CursorEffect />
       {/* Show navbar only for non-admin routes */}
       {!isAdminRoute && <Navbar />}
       {/* Add padding-top to account for fixed navbar only for non-admin routes */}
@@ -50,14 +48,14 @@ function AppContent() {
           <Routes location={location} key={location.pathname}>
             {/* Home route - show home page or redirect if logged in */}
             <Route path="/" element={<Home />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/jobs/match" element={<ProtectedRoute><JobMatchPage /></ProtectedRoute>} />
+            <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
             <Route path="/jobs/:id" element={<JobDetails />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/signup" element={<Register />} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/chatbot" element={<ProtectedRoute><ChatBot /></ProtectedRoute>} />
             <Route path="/admin-login" element={<AdminLogin />} />
