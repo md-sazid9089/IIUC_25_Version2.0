@@ -29,6 +29,7 @@ import ChatBot from "./pages/ChatBot";
 import AdminPanel from "./pages/AdminPanel";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminCourses from "./pages/AdminCourses";
 
 function AppContent() {
   const location = useLocation();
@@ -61,6 +62,7 @@ function AppContent() {
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/admin-dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
             <Route path="/admin/jobs" element={<AdminProtectedRoute><AdminPanel /></AdminProtectedRoute>} />
+            <Route path="/admin/courses" element={<AdminProtectedRoute><AdminCourses /></AdminProtectedRoute>} />
           </Routes>
         </AnimatePresence>
       </div>

@@ -54,6 +54,12 @@ const AdminLayout = ({ children }) => {
       badge: null
     },
     {
+      name: 'Courses',
+      icon: Briefcase,
+      href: '/admin/courses',
+      badge: null
+    },
+    {
       name: 'Settings',
       icon: Settings,
       href: '#',
