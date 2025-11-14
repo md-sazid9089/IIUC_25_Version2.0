@@ -124,7 +124,7 @@ Job Matching Engine:
   - Experience Match (20%): Perfect match (Student level)
   - Career Track (20%): Web Development match
   - Location (10%): Remote preference matched
-  
+
 Skill Gap Identified:
 ✗ Missing: TypeScript
 → Recommended Learning Resources:
@@ -146,12 +146,12 @@ Gemini AI Generates:
   - Learn HTML/CSS advanced concepts
   - Master JavaScript ES6+
   - React.js framework
-  
+
 📍 Phase 2 (Months 3-4): Backend Development
   - Node.js & Express
   - RESTful API design
   - Database (MongoDB/PostgreSQL)
-  
+
 📍 Phase 3 (Months 5-6): Full-Stack Projects
   - Build 3 portfolio projects
   - Deploy to cloud platforms
@@ -174,12 +174,14 @@ Gemini AI Generates:
 ### 4. API Endpoints
 
 **Backend (Python FastAPI):**
+
 ```
 POST /chat                       - AI chat endpoint (Gemini integration)
 GET  /docs                       - FastAPI auto-generated documentation
 ```
 
 **Frontend (Firebase Firestore):**
+
 ```
 Collections:
 - users                          - User profiles with skills, tools, preferences
@@ -325,6 +327,7 @@ frontend/
 ### Firebase Firestore Collections
 
 **Users Collection:**
+
 - User profiles with authentication
 - Skills array (programming languages, frameworks, tools)
 - Tools/Technologies array
@@ -334,6 +337,7 @@ frontend/
 - Profile completion percentage
 
 **Jobs Collection:**
+
 - Job listings from multiple companies
 - Required skills array
 - Experience level requirements
@@ -343,6 +347,7 @@ frontend/
 - Application tracking
 
 **Learning Resources Collection:**
+
 - Curated courses and tutorials
 - Platform (Coursera, Udemy, YouTube, freeCodeCamp, etc.)
 - Skill tags for matching
@@ -351,17 +356,20 @@ frontend/
 - Direct links to external platforms
 
 **Applications Collection:**
+
 - User job applications
 - Application status tracking
 - Timestamp for sorting
 - Composite index: userId (Ascending) + appliedAt (Descending)
 
 **Courses Collection:**
+
 - Enrolled courses tracking
 - User progress monitoring
 - Learning path management
 
 **Chatbot Collection:**
+
 - Chat history persistence
 - User conversation context
 
@@ -376,31 +384,33 @@ frontend/
 
 function calculateMatchScore(job, userProfile) {
   let totalScore = 0;
-  
+
   // 1. Skills Match (50 points - highest weight)
   const matchedSkills = intersection(job.requiredSkills, userProfile.skills);
   const skillScore = (matchedSkills.length / job.requiredSkills.length) * 50;
   totalScore += skillScore;
-  
+
   // 2. Experience Level Match (20 points)
   if (job.experienceLevel === userProfile.experienceLevel) {
     totalScore += 20;
-  } else if (isAdjacentLevel(job.experienceLevel, userProfile.experienceLevel)) {
+  } else if (
+    isAdjacentLevel(job.experienceLevel, userProfile.experienceLevel)
+  ) {
     totalScore += 10; // Partial match for adjacent levels
   }
-  
+
   // 3. Career Track Match (20 points)
   if (job.careerTrack === userProfile.track) {
     totalScore += 20;
   } else if (isRelatedTrack(job.careerTrack, userProfile.track)) {
     totalScore += 10; // Partial match for related tracks
   }
-  
+
   // 4. Location Preference Match (10 points)
   if (job.location === userProfile.location || job.location === "Remote") {
     totalScore += 10;
   }
-  
+
   return {
     score: Math.round(totalScore),
     matchedSkills: matchedSkills,
@@ -408,8 +418,8 @@ function calculateMatchScore(job, userProfile) {
       skills: skillScore,
       experience: experienceScore,
       track: trackScore,
-      location: locationScore
-    }
+      location: locationScore,
+    },
   };
 }
 ```
@@ -422,31 +432,31 @@ function calculateMatchScore(job, userProfile) {
 function identifySkillGaps(userProfile, targetJobs) {
   const userSkills = new Set(userProfile.skills);
   const missingSkills = new Set();
-  
+
   // Identify all required skills from target jobs
-  targetJobs.forEach(job => {
-    job.requiredSkills.forEach(skill => {
+  targetJobs.forEach((job) => {
+    job.requiredSkills.forEach((skill) => {
       if (!userSkills.has(skill)) {
         missingSkills.add(skill);
       }
     });
   });
-  
+
   // Match missing skills with learning resources
-  const recommendations = learningResources.filter(resource => {
-    return resource.relatedSkills.some(skill => 
-      missingSkills.has(skill)
-    );
-  }).sort((a, b) => {
-    // Prioritize: Free > Beginner > Multiple skill coverage
-    const scoreA = calculateResourceScore(a, missingSkills);
-    const scoreB = calculateResourceScore(b, missingSkills);
-    return scoreB - scoreA;
-  });
-  
+  const recommendations = learningResources
+    .filter((resource) => {
+      return resource.relatedSkills.some((skill) => missingSkills.has(skill));
+    })
+    .sort((a, b) => {
+      // Prioritize: Free > Beginner > Multiple skill coverage
+      const scoreA = calculateResourceScore(a, missingSkills);
+      const scoreB = calculateResourceScore(b, missingSkills);
+      return scoreB - scoreA;
+    });
+
   return {
     missingSkills: Array.from(missingSkills),
-    recommendedResources: recommendations
+    recommendedResources: recommendations,
   };
 }
 ```
@@ -456,18 +466,21 @@ function identifySkillGaps(userProfile, targetJobs) {
 ## ✨ Advanced Features Included
 
 ### AI-Powered Features
+
 ✅ **Google Gemini AI Integration** for intelligent responses
 ✅ **Career Roadmap Generator** with personalized learning paths
 ✅ **Interactive Chatbot** for career guidance
 ✅ **Context-Aware Conversations** with history tracking
 
 ### Matching & Analysis
+
 ✅ **Real-Time Job Match Scores** (0-100 scale)
 ✅ **Skill Gap Identification** with automated analysis
 ✅ **Personalized Learning Recommendations** based on gaps
 ✅ **Multi-Factor Scoring** (skills, experience, track, location)
 
 ### User Experience
+
 ✅ **Skill & Tool Tags** with add/remove chips (color-coded)
 ✅ **Profile Completion Tracking** with percentage display
 ✅ **Toast Notifications** (React Hot Toast) for all actions
@@ -478,12 +491,14 @@ function identifySkillGaps(userProfile, targetJobs) {
 ✅ **Custom Cursor Effects** for enhanced interaction
 
 ### Admin Features
+
 ✅ **Admin Dashboard** for platform management
 ✅ **Job Management** (add, edit, delete)
 ✅ **Course Management** (curate learning resources)
 ✅ **User Activity Monitoring** and analytics
 
 ### Performance Optimizations
+
 ✅ **Lazy Loading** all routes with React.lazy()
 ✅ **Code Splitting** with manual chunks (vendor, firebase, ui)
 ✅ **React Memoization** (useMemo, useCallback, React.memo)
@@ -511,6 +526,7 @@ function identifySkillGaps(userProfile, targetJobs) {
 This project demonstrates modern full-stack development with AI integration:
 
 ### Backend Technologies
+
 - ✅ **Python 3.11+** programming
 - ✅ **FastAPI** web framework
 - ✅ **Uvicorn** ASGI server
@@ -521,6 +537,7 @@ This project demonstrates modern full-stack development with AI integration:
 - ✅ **PDF processing** with PyPDF2
 
 ### Frontend Technologies
+
 - ✅ **React 18** with hooks (useState, useEffect, useContext, useMemo, useCallback)
 - ✅ **Vite 5** build tool and dev server
 - ✅ **Firebase Authentication** (Email/Password, Google OAuth)
@@ -533,6 +550,7 @@ This project demonstrates modern full-stack development with AI integration:
 - ✅ **Lucide React** icons
 
 ### Advanced Concepts
+
 - ✅ **AI Integration** with Google Gemini
 - ✅ **Real-time databases** with Firestore
 - ✅ **OAuth 2.0** authentication
@@ -547,6 +565,7 @@ This project demonstrates modern full-stack development with AI integration:
 - ✅ **Production build optimization**
 
 ### Software Engineering Practices
+
 - ✅ **Git version control** with GitHub
 - ✅ **Environment configuration** (.env files)
 - ✅ **Code organization** and modularity
