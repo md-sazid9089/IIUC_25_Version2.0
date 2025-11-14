@@ -34,12 +34,12 @@ This feature implements an AI-powered job matching system that calculates compat
 {
   uid: string,
   email: string,
-  
+
   // Job matching fields
   skills: string[],                    // e.g., ["react", "javascript", "node.js"]
   experienceLevel: string,             // "beginner" | "intermediate" | "advanced"
   preferredTrack: string,              // "frontend" | "backend" | "fullstack" | "mobile" | "devops" | "data science" | "qa"
-  
+
   // Optional fields
   displayName: string,
   bio: string,
@@ -86,26 +86,28 @@ skillScore = (matchedSkills / totalRequiredSkills) × 60
 
 #### 2. Experience Match (20 points)
 
-| Scenario | Points | Note |
-|----------|--------|------|
-| Exact match | 20 | Same experience level |
-| 1 level difference | 10 | Slightly over/under qualified |
-| 2+ levels difference | 0 | Significant mismatch |
+| Scenario             | Points | Note                          |
+| -------------------- | ------ | ----------------------------- |
+| Exact match          | 20     | Same experience level         |
+| 1 level difference   | 10     | Slightly over/under qualified |
+| 2+ levels difference | 0      | Significant mismatch          |
 
 **Experience levels hierarchy:**
+
 ```
 beginner → intermediate → advanced
 ```
 
 #### 3. Track Match (20 points)
 
-| Scenario | Points | Note |
-|----------|--------|------|
-| Exact match | 20 | Same track |
-| Similar track | 10 | Related (e.g., frontend ↔ fullstack) |
-| Different track | 0 | Unrelated fields |
+| Scenario        | Points | Note                                 |
+| --------------- | ------ | ------------------------------------ |
+| Exact match     | 20     | Same track                           |
+| Similar track   | 10     | Related (e.g., frontend ↔ fullstack) |
+| Different track | 0      | Unrelated fields                     |
 
 **Similar tracks:**
+
 - Frontend ↔ Fullstack
 - Backend ↔ Fullstack
 - Mobile: React Native, Flutter, iOS, Android
@@ -114,12 +116,12 @@ beginner → intermediate → advanced
 
 ### Match Level Classification
 
-| Score Range | Level | Color |
-|-------------|-------|-------|
-| 80-100 | Excellent Match | Green |
-| 60-79 | Good Match | Blue |
-| 40-59 | Fair Match | Yellow |
-| 0-39 | Low Match | Red |
+| Score Range | Level           | Color  |
+| ----------- | --------------- | ------ |
+| 80-100      | Excellent Match | Green  |
+| 60-79       | Good Match      | Blue   |
+| 40-59       | Fair Match      | Yellow |
+| 0-39        | Low Match       | Red    |
 
 ---
 
@@ -128,14 +130,17 @@ beginner → intermediate → advanced
 ### Job Match Page
 
 1. **User Profile Summary**
+
    - Display current skills, experience level, and preferred track
    - Quick overview of user's profile
 
 2. **Search & Filters**
+
    - Search by job title, company, or skills
    - Filter by match level (Excellent/Good/Fair/Low)
 
 3. **Statistics Dashboard**
+
    - Total jobs available
    - Count by match level
 
@@ -168,12 +173,14 @@ Users need to complete their profiles with required fields. You can:
 
 **Option A: Update Profile Page**
 Add form fields to `src/pages/Profile.jsx` for:
+
 - Skills (array input)
 - Experience Level (dropdown)
 - Preferred Track (dropdown)
 
 **Option B: Manual Firestore Update**
 Update user documents directly in Firebase Console:
+
 ```javascript
 {
   skills: ["react", "javascript", "typescript"],
@@ -185,10 +192,12 @@ Update user documents directly in Firebase Console:
 ### Step 2: Seed Job Data
 
 **Option A: Use Firebase Console**
+
 1. Import `src/data/sampleJobs.json` into Firestore
 2. Collection name: `jobs`
 
 **Option B: Use Seeding Script**
+
 1. Open your app in browser while logged in
 2. Open browser console (F12)
 3. Import and run the seed function from `src/data/seedData.js`
@@ -213,9 +222,9 @@ Edit `src/utils/matchScore.js`:
 
 ```javascript
 // Change scoring weights
-const skillScore = (matchedSkills.length / jobSkills.length) * 60;  // Change 60
-const expScore = 20;  // Max experience points
-const trackScore = 20;  // Max track points
+const skillScore = (matchedSkills.length / jobSkills.length) * 60; // Change 60
+const expScore = 20; // Max experience points
+const trackScore = 20; // Max track points
 ```
 
 ### Add New Job Fields
@@ -229,8 +238,8 @@ const trackScore = 20;  // Max track points
 Edit `getMatchLevel()` in `src/utils/matchScore.js`:
 
 ```javascript
-if (score >= 80) return 'Excellent';  // Change threshold
-if (score >= 60) return 'Good';
+if (score >= 80) return "Excellent"; // Change threshold
+if (score >= 60) return "Good";
 // etc.
 ```
 
@@ -239,6 +248,7 @@ if (score >= 60) return 'Good';
 ## 📝 Sample Data Included
 
 **20 diverse job postings** covering:
+
 - Frontend: React, Vue, Angular
 - Backend: Node.js, Python Django, Java Spring Boot
 - Fullstack: MERN, WordPress
@@ -257,27 +267,31 @@ Located in: `src/data/sampleJobs.json`
 ### Issue: "Profile not found" error
 
 **Solution**: User document must exist in Firestore with required fields
+
 ```javascript
 { skills: [], experienceLevel: "", preferredTrack: "" }
 ```
 
 ### Issue: No jobs showing
 
-**Solution**: 
+**Solution**:
+
 1. Check if jobs collection exists in Firestore
 2. Verify collection name is exactly "jobs"
 3. Check Firebase rules allow read access
 
 ### Issue: Match scores all showing 0%
 
-**Solution**: 
+**Solution**:
+
 1. Verify user profile has skills array with values
 2. Check job documents have skillsRequired array
 3. Skills must match (case-insensitive)
 
 ### Issue: Apply links not working
 
-**Solution**: 
+**Solution**:
+
 1. Check `applyLinks` object exists in job document
 2. Verify URLs are valid and properly formatted
 3. Only links that exist will render buttons
@@ -289,27 +303,33 @@ Located in: `src/data/sampleJobs.json`
 Potential improvements you could add:
 
 1. **Save/Bookmark Jobs**
+
    - Allow users to save interesting job matches
    - Create a "Saved Jobs" collection
 
 2. **Application Tracking**
+
    - Track which jobs users have applied to
    - Add "Applied" status to job cards
 
 3. **Advanced Filters**
+
    - Filter by location
    - Filter by company
    - Salary range filters
 
 4. **Email Notifications**
+
    - Notify users of new high-match jobs
    - Weekly digest of top matches
 
 5. **Profile Recommendations**
+
    - Suggest skills to learn for better matches
    - Show skill gap analysis
 
 6. **Company Reviews**
+
    - Integrate rating/review system
    - Link to company profiles
 
@@ -324,16 +344,18 @@ Potential improvements you could add:
 ### Key Functions
 
 **Calculate Match Score:**
+
 ```javascript
-import { calculateMatchScore } from '../utils/matchScore';
+import { calculateMatchScore } from "../utils/matchScore";
 
 const result = calculateMatchScore(userProfile, job);
 // Returns: { score, matchedSkills, missingSkills, experienceNote, trackNote }
 ```
 
 **Get Match Level:**
+
 ```javascript
-import { getMatchLevel } from '../utils/matchScore';
+import { getMatchLevel } from "../utils/matchScore";
 
 const level = getMatchLevel(75);
 // Returns: { level, color, textColor, glow }
@@ -342,15 +364,17 @@ const level = getMatchLevel(75);
 ### Firebase Queries
 
 **Fetch User Profile:**
+
 ```javascript
-const userDoc = await getDoc(doc(db, 'users', userId));
+const userDoc = await getDoc(doc(db, "users", userId));
 const userData = userDoc.data();
 ```
 
 **Fetch All Jobs:**
+
 ```javascript
-const jobsSnapshot = await getDocs(collection(db, 'jobs'));
-const jobs = jobsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+const jobsSnapshot = await getDocs(collection(db, "jobs"));
+const jobs = jobsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 ```
 
 ---

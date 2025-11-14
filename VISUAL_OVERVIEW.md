@@ -170,9 +170,9 @@ Frontend (6)          Backend (4)           Fullstack (3)
 ├── React Developer   ├── Node.js Dev       ├── MERN Stack
 ├── Vue.js Developer  ├── Python Django     ├── Full Stack Eng
 ├── Angular Dev       ├── Java Spring Boot  └── WordPress Dev
-├── Junior React      └── Cybersecurity     
-├── UI/UX + Frontend  
-└── Graphic + Web     
+├── Junior React      └── Cybersecurity
+├── UI/UX + Frontend
+└── Graphic + Web
 
 Mobile (2)            DevOps (2)            Data Science (2)
 ├── React Native      ├── DevOps Engineer   ├── Data Scientist
