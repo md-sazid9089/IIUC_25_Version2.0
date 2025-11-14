@@ -29,35 +29,32 @@ const jobsSnapshot = await getDocs(collection(db, 'jobs'));
 For each job, the system calculates a compatibility score using `calculateMatchScore()`:
 
 **Scoring Factors:**
-- **Skills Match (50% weight)**
+- **Skills Match (60% weight)**
   - Compares user skills with job's required skills
   - Identifies missing skills (skills required but not possessed)
-  - Formula: `(matching skills / required skills) × 50`
+  - Formula: `(matching skills / required skills) × 60`
 
 - **Experience Level (20% weight)**
   - Exact match: 20 points
-  - One level difference: 10 points
+  - One level difference (adjacent): 10 points
   - Two+ levels difference: 0 points
+  - Levels: Beginner → Intermediate → Advanced
 
 - **Career Track (20% weight)**
   - Exact match: 20 points
-  - No match: 0 points
-
-- **Location (10% weight)**
-  - Exact match or "Remote": 10 points
-  - No match: 0 points
+  - Similar track (e.g., Frontend & Full Stack): 10 points
+  - Different track: 0 points
 
 **Example Calculation:**
 ```
 User Skills: [React, JavaScript, CSS]
 Job Required: [React, JavaScript, TypeScript, Node.js]
 
-Skills Match: 2/4 = 50% → 25 points (out of 50)
+Skills Match: 2/4 = 50% → 30 points (out of 60)
 Experience Match: Both "Intermediate" → 20 points
 Track Match: Both "Frontend" → 20 points
-Location Match: "Remote" → 10 points
 
-Total Score: 75/100
+Total Score: 70/100
 ```
 
 ### 3. **Identifying Skill Gaps**
@@ -260,11 +257,10 @@ frontend/src/
 
 ### **Analysis Result:**
 ```
-Match Score: 58/100
-- Skills Match: 1/5 = 20% → 10/50 points
+Match Score: 42/100
+- Skills Match: 1/5 = 20% → 12/60 points
 - Experience: One level below → 10/20 points
 - Track: Exact match → 20/20 points
-- Location: Remote → 10/10 points
 
 Missing Skills: ['TypeScript', 'Next.js', 'Redux', 'Testing']
 ```
