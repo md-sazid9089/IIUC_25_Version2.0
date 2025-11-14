@@ -6,9 +6,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Target, BookOpen, Users, Sparkles, TrendingUp, Award } from 'lucide-react';
-import SimpleHoverEffect from '../SimpleHoverEffect';
-import SimpleWebEffect from '../SimpleWebEffect';
-import FeatureReveal from '../features/FeatureReveal/FeatureReveal';
 
 const Home = () => {
   const features = [
@@ -92,17 +89,13 @@ const Home = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <SimpleHoverEffect accentColor="#A855F7">
-                    <Link to="/register" className="btn-primary flex items-center justify-center space-x-2">
-                      <span>Get Started</span>
-                      <ArrowRight size={18} />
-                    </Link>
-                  </SimpleHoverEffect>
-                  <SimpleHoverEffect accentColor="#A855F7">
-                    <Link to="/jobs" className="btn-outline-neon flex items-center justify-center space-x-2">
-                      <span>Explore Jobs</span>
-                    </Link>
-                  </SimpleHoverEffect>
+                  <Link to="/register" className="btn-primary flex items-center justify-center space-x-2">
+                    <span>Get Started</span>
+                    <ArrowRight size={18} />
+                  </Link>
+                  <Link to="/jobs" className="btn-outline-neon flex items-center justify-center space-x-2">
+                    <span>Explore Jobs</span>
+                  </Link>
                 </div>
 
                 {/* Stats */}
@@ -177,9 +170,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Feature Reveal Section */}
-      <FeatureReveal />
       
       {/* Stats Section */}
       <section className="stats-section bg-base py-16">

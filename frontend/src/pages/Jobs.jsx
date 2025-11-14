@@ -5,10 +5,8 @@ import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateMatchScore, getMatchLevel } from '../utils/matchScore';
 import { getLearningSuggestions } from '../utils/getLearningSuggestions';
-import { applicationsService } from '../services/firestoreService';
 import SkillGapCard from '../components/SkillGapCard';
 import LearningSuggestionCard from '../components/LearningSuggestionCard';
-import toast from 'react-hot-toast';
 import { 
   Briefcase, 
   MapPin, 
@@ -21,8 +19,7 @@ import {
   Loader,
   AlertCircle,
   Search,
-  BookOpen,
-  Send
+  BookOpen
 } from 'lucide-react';
 
 const Jobs = () => {
@@ -446,7 +443,7 @@ const JobCard = ({ job, index, learningResources, currentUser }) => {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3">
-            {/* Apply Button */}
+            {/* Apply Now Button */}
             <button
               onClick={handleApply}
               disabled={applying || hasApplied}
@@ -454,7 +451,7 @@ const JobCard = ({ job, index, learningResources, currentUser }) => {
                 hasApplied 
                   ? 'bg-green-500/20 border-green-500/40 text-green-400 cursor-not-allowed' 
                   : 'btn-primary'
-              } flex items-center gap-2 transition-all duration-300`}
+              } flex items-center gap-2 transition-all duration-300 px-4 py-2 rounded-lg border`}
             >
               {applying ? (
                 <>
@@ -479,7 +476,7 @@ const JobCard = ({ job, index, learningResources, currentUser }) => {
                 href={job.applyLinks.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary flex items-center gap-2"
+                className="btn-outline-neon flex items-center gap-2"
               >
                 <ExternalLink size={16} />
                 LinkedIn
