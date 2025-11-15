@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, Menu, X, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import { Briefcase, Menu, X, LogOut, Settings, LayoutDashboard, TrendingUp } from 'lucide-react';
 import { getAuth, signOut } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
@@ -168,6 +168,15 @@ const AdminLayout = ({ children }) => {
 
         {/* Bottom Section */}
         <div className="p-4 border-t border-[rgba(168,85,247,0.1)] space-y-2">
+          {/* Job Market Insights Button */}
+          <a
+            href="/job-market-insights"
+            className="w-full flex items-center space-x-2 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white transition-all duration-200 group text-sm"
+          >
+            <TrendingUp size={18} />
+            <span className="text-center flex-1">Job Market Insights</span>
+          </a>
+
           {/* Logout Button */}
           <motion.button
             initial={{ opacity: 0, x: -20 }}

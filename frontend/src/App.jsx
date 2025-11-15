@@ -44,13 +44,15 @@ const PageLoader = () => (
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const hideNavbarRoutes = ['/job-market-insights'];
+  const shouldHideNavbar = isAdminRoute || hideNavbarRoutes.includes(location.pathname);
 
   return (
     <div className="App">
-      {/* Show navbar only for non-admin routes */}
-      {!isAdminRoute && <Navbar />}
+      {/* Show navbar only for non-admin routes and non-navbar-hidden routes */}
+      {!shouldHideNavbar && <Navbar />}
       {/* Add padding-top to account for fixed navbar only for non-admin routes */}
-      <div className={!isAdminRoute ? 'pt-20' : ''}>
+      <div className={!shouldHideNavbar ? 'pt-20' : ''}>
         <Suspense fallback={<PageLoader />}>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>

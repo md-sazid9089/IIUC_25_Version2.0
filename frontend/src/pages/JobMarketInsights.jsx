@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, BarChart3, Briefcase, Target, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { TrendingUp, BarChart3, Briefcase, Target } from 'lucide-react';
+import AdminLayout from '../components/AdminLayout';
 
 const JobMarketInsights = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('employment');
 
   const data = {
@@ -87,21 +86,23 @@ const JobMarketInsights = () => {
   };
 
   return (
-    <div className="min-h-screen bg-base py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <button
-            onClick={() => navigate('/jobs')}
-            className="mb-4 flex items-center gap-2 text-primary hover:text-primary-light transition-colors"
+    <AdminLayout>
+      <div className="min-h-screen bg-base py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
           >
-            <ArrowLeft size={20} />
-            Back to Jobs
-          </button>
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold glow-text mb-4">
+                Bangladesh Job Market Insights 2025
+              </h1>
+              <p className="text-muted text-lg max-w-2xl mx-auto">
+                Comprehensive analysis of employment trends, industry growth, and top opportunities
+              </p>
+            </div>
           <h1 className="text-4xl md:text-5xl font-bold glow-text mb-4">
             Bangladesh Job Market Insights 2025
           </h1>
@@ -317,8 +318,9 @@ const JobMarketInsights = () => {
               ))}
           </motion.div>
         )}
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 
