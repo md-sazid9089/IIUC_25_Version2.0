@@ -236,9 +236,9 @@ export default function Chatassistance() {
         parts: [{ text: m.content }],
       }));
 
-      // Call Gemini API directly with correct model name
+      // Call Gemini API directly using v1 endpoint
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

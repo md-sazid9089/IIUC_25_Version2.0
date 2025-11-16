@@ -419,8 +419,6 @@ Keep it SHORT and concise.`;
             )}
 
             <motion.button
-              style={{ marginTop: "2rem" }}
-            <motion.button
               whileHover={{ scale: 1.02, boxShadow: '0 8px 24px rgba(168,85,247,0.4)' }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSaveToProfile}
@@ -428,6 +426,7 @@ Keep it SHORT and concise.`;
               style={{
                 ...styles.saveButton,
                 ...(saving && styles.saveButtonDisabled),
+                marginTop: "2rem",
               }}
             >
               <div style={styles.saveButtonContent}>
